@@ -1,0 +1,26 @@
+{
+  "name": "snap-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -w",
+    "dev": "nodemon build/index.js",
+    "start": "node build/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.5.2",
+    "fastify": "^4.24.3",
+    "fastify-plugin": "^4.5.1",
+    "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.9",
+    "@types/pino": "^7.0.5",
+    "prisma": "^5.5.2",
+    "typescript": "^5.2.2"
+  }
+}
