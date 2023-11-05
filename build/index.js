@@ -38,4 +38,9 @@ server.register(cors_1.default, {
     methods: ["GET", "POST", "PUT", "DELETE"],
 });
 server.register(router_1.default);
-server.listen({ port: PORT });
+if (process.env.NODE_ENV === "production") {
+    server.listen({ port: PORT, host: "0.0.0.0" });
+}
+else {
+    server.listen({ port: PORT });
+}

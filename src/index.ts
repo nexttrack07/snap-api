@@ -15,4 +15,8 @@ server.register(fastifyCors, {
 
 server.register(router);
 
-server.listen({ port: PORT });
+if (process.env.NODE_ENV === "production") {
+    server.listen({ port: PORT, host: "0.0.0.0" })
+} else {
+    server.listen({ port: PORT })
+}
