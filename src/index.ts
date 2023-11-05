@@ -1,4 +1,4 @@
-import Fastify, { FastifyReply, FastifyRequest } from "fastify";
+import Fastify  from "fastify";
 import * as dotenv from "dotenv";
 import fastifyCors from "@fastify/cors";
 import router from "./router";
