@@ -7,5 +7,43 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_PROD")
+}
+
+model Family {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  fonts Font[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  fonts Font[]
+}
+
+model Kind {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  fonts Font[]
+}
+
+model Font {
+  id         Int       @id @default(autoincrement())
+  familyId   Int
+  family     Family    @relation(fields: [familyId], references: [id])
+  categoryId Int
+  category   Category  @relation(fields: [categoryId], references: [id])
+  kindId     Int
+  kind       Kind      @relation(fields: [kindId], references: [id])
+  subsets    String[]
+  variants   Variant[]
+}
+
+model Variant {
+  id       Int    @id @default(autoincrement())
+  name     String
+  imageUrl String
+  fontId   Int
+  font     Font   @relation(fields: [fontId], references: [id])
 }

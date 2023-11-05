@@ -1,15 +1,19 @@
-import { fastify  } from "fastify";
-import { PrismaClient } from "@prisma/client";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
+import * as dotenv from "dotenv";
+import fastifyCors from "@fastify/cors";
+import router from "./router";
+
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-const server = fastify({ logger: true });
+const server = Fastify({ logger: true });
 
-const prisma = new PrismaClient();
+server.register(fastifyCors, {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+});
 
-server.get("/fonts", async (request, reply) => {
-    const fonts = await prisma.font.findMany();
-    return fonts;
-})
+server.register(router);
 
 const start = async () => {
     try {
