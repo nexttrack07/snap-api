@@ -35,7 +35,7 @@ export default async function fontController(fastify: FastifyInstance) {
 
     return {
         fonts: formattedFonts,
-        nextPage: request.query.page + 1,
+        nextPage: +request.query.page + 1,
     }
   });
 }

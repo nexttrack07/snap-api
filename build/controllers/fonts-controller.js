@@ -37,7 +37,7 @@ function fontController(fastify) {
                 }));
                 return {
                     fonts: formattedFonts,
-                    nextPage: request.query.page + 1,
+                    nextPage: +request.query.page + 1,
                 };
             });
         });
