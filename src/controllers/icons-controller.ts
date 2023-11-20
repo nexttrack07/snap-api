@@ -1,49 +1,7 @@
-import { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginAsync } from "fastify";
-import axios from "axios";
-import FormData from "form-data";
+import { FastifyInstance, FastifyReply, FastifyPluginAsync } from "fastify";
 import OAuth from "oauth";
-// import { redis } from "../db-connect";
 import { clerkPreHandler } from "../auth";
 import fastifyPlugin from "fastify-plugin";
-
-/*
-FLATICON API TO SEARCH:
-var headers = {
-  'Accept':'application/json',
-  'Authorization':'string'
-
-};
-
-$.ajax({
-  url: 'https://api.flaticon.com/v3/search/icons/{orderBy}',
-  method: 'get',
-  data: '?q=string',
-  headers: headers,
-  success: function(data) {
-    console.log(JSON.stringify(data));
-  }
-})
-Auth: 
-
-var headers = {
-  'Content-Type':'multipart/form-data',
-  'Accept':'application/json'
-
-};
-Parameter Name: apiKey, in: body.
-
-$.ajax({
-  url: 'https://api.flaticon.com/v3/app/authentication',
-  method: 'post',
-
-  headers: headers,
-  success: function(data) {
-    console.log(JSON.stringify(data));
-  }
-})
-
-*/
-
 
 const opts = {
   preHandler: clerkPreHandler,
@@ -85,15 +43,6 @@ const opts = {
         }
     });
 }
-
-// function getIconSearch(term: string, token: string) {
-//     return axios.get(`https://api.flaticon.com/v3/search/icons/orderBy=popular?q=${term}`, {
-//         headers: {
-//             Accept: "application/json",
-//             Authorization: token,
-//         },
-//     });
-// }
 
 
 export default fastifyPlugin(iconController);
