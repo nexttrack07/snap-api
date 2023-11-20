@@ -1,14 +1,16 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginAsync } from "fastify";
 import { prisma } from "../db-connect";
+import { clerkPreHandler } from "../auth";
+import fastifyPlugin from "fastify-plugin";
 
 type FontRequest = FastifyRequest<{
     Querystring: { page: number };
 }>;
 
-export default async function fontController(fastify: FastifyInstance) {
+const fontController: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   // GET /api/v1/user
-  fastify.get("/", async function (
-    request: FontRequest,
+  fastify.get("/api/v1/fonts", { preHandler: clerkPreHandler }, async function (
+    request: any,
     reply: FastifyReply
   ) {
     const fonts = await prisma.font.findMany({
@@ -39,3 +41,5 @@ export default async function fontController(fastify: FastifyInstance) {
     }
   });
 }
+
+export default fastifyPlugin(fontController);
