@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fonts_controller_1 = __importDefault(require("./controllers/fonts-controller"));
 const icons_controller_1 = __importDefault(require("./controllers/icons-controller"));
 const photos_controller_1 = __importDefault(require("./controllers/photos-controller"));
+const designs_controller_1 = __importDefault(require("./controllers/designs-controller"));
 function router(fastify) {
     return __awaiter(this, void 0, void 0, function* () {
         fastify.register(fonts_controller_1.default),
             fastify.register(icons_controller_1.default),
-            fastify.register(photos_controller_1.default, { prefix: "/api/v1/photos" });
+            fastify.register(photos_controller_1.default, { prefix: "/api/v1/photos" }),
+            fastify.register(designs_controller_1.default, { prefix: "/api/v1/designs" });
     });
 }
 exports.default = router;

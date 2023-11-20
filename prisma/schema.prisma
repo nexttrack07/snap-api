@@ -57,3 +57,16 @@ model Upload {
 
   @@map("uploads")
 }
+
+model Design {
+  id           String   @id @default(uuid())
+  name         String
+  userId       String
+  canvasWidth  Int
+  canvasHeight Int
+  background   String
+  elements     String
+  fonts        String[]
+
+  @@map("designs")
+}
