@@ -1,7 +1,7 @@
 import { getAuth } from "@clerk/fastify";
 import { FastifyInstance } from "fastify";
 import { prisma } from "../db-connect";
-import { Optional, Static, Type } from "@sinclair/typebox";
+import { Static, Type } from "@sinclair/typebox";
 import { clerkPreHandler } from "../auth";
 
 const Design = Type.Object({

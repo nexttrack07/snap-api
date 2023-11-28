@@ -70,3 +70,26 @@ model Design {
 
   @@map("designs")
 }
+
+model BlockCategory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  blocks    Block[]
+
+  @@map("block_categories")
+}
+
+model Block {
+  id         String        @id @default(uuid())
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  userId     String
+  elements   String
+  url        String
+  categoryId Int
+  category   BlockCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("blocks")
+}
