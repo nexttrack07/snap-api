@@ -16,12 +16,14 @@ const fonts_controller_1 = __importDefault(require("./controllers/fonts-controll
 const icons_controller_1 = __importDefault(require("./controllers/icons-controller"));
 const photos_controller_1 = __importDefault(require("./controllers/photos-controller"));
 const designs_controller_1 = __importDefault(require("./controllers/designs-controller"));
+const blocks_controller_1 = __importDefault(require("./controllers/blocks-controller"));
 function router(fastify) {
     return __awaiter(this, void 0, void 0, function* () {
         fastify.register(fonts_controller_1.default),
             fastify.register(icons_controller_1.default),
             fastify.register(photos_controller_1.default, { prefix: "/api/v1/photos" }),
-            fastify.register(designs_controller_1.default, { prefix: "/api/v1/designs" });
+            fastify.register(designs_controller_1.default, { prefix: "/api/v1/designs" }),
+            fastify.register(blocks_controller_1.default, { prefix: "/api/v1/blocks" });
     });
 }
 exports.default = router;

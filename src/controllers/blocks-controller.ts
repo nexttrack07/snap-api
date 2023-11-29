@@ -102,4 +102,15 @@ export default async function blocksController(fastify: FastifyInstance) {
         });
         reply.status(200).send(categories);
     });
+
+
+    // get block by id
+    fastify.get<{ Params: { id: string }; Reply: BlockType | null }>("/:id", async (request, reply) => {
+        const block = await prisma.block.findUnique({
+            where: {
+                id: request.params.id,
+            },
+        });
+        reply.status(200).send(block);
+    });
 }

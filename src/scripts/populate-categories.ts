@@ -6,7 +6,7 @@ const CATEGORIES = ["Headlines", "Features", "Bullets", "Callouts"];
 async function populate() {
   // populate the categories
   for (const categoryName of CATEGORIES) {
-    await prisma.category.create({
+    await prisma.blockCategory.create({
       data: {
         name: categoryName,
       },
