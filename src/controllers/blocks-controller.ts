@@ -1,116 +1,104 @@
-import { Static, Type } from "@sinclair/typebox";
 import { clerkPreHandler } from "../auth";
 import { FastifyInstance } from "fastify";
 import { getAuth } from "@clerk/fastify";
 import { prisma } from "../db-connect";
-
-const Block = Type.Object({
-    id: Type.Optional(Type.String()),
-    userId: Type.Optional(Type.String()),
-    elements: Type.String(),
-    url: Type.Optional(Type.String()),
-    categoryId: Type.Number(),
-})
-
-export type BlockType = Static<typeof Block>
-
-const BlockCategory = Type.Object({
-    id: Type.Optional(Type.Number()),
-    name: Type.String(),
-})
-
-export type BlockCategoryType = Static<typeof BlockCategory>
+import blocksRepo, {
+  Block,
+  BlockType,
+  BlockCategory,
+  BlockCategoryType,
+} from "../repositories/blocks-repo";
+import { screenshotQueue } from "../lib/queue";
 
 export default async function blocksController(fastify: FastifyInstance) {
-    // post a new block
-    fastify.post<{ Body: BlockType; Reply: BlockType }>(
-        "/",
-        {
-            schema: {
-                body: Block,
-                response: {
-                    200: Block,
-                },
-            },
-            preHandler: clerkPreHandler,
+  // post a new block
+  fastify.post<{ Body: BlockType; Reply: BlockType }>(
+    "/",
+    {
+      schema: {
+        body: Block,
+        response: {
+          200: Block,
         },
-        (request, reply) => {
-            const { elements, categoryId, url } = request.body;
-            const auth = getAuth(request);
-            const userId = auth.userId as string;
+      },
+      preHandler: clerkPreHandler,
+    },
+    async (request, reply) => {
+      const { elements, categoryId, url } = request.body;
+      const auth = getAuth(request);
+      const userId = auth.userId as string;
+      const data = {
+        elements,
+        userId,
+        categoryId,
+        url: url || "",
+      };
 
-            prisma.block
-                .create({
-                    data: {
-                        elements,
-                        userId,
-                        categoryId,
-                        url: url || "",
-                    },
-                })
-                .then((block) => {
-                    reply.status(200).send({
-                        ...block,
-                        id: block.id,
-                    });
-                })
-                .catch((err) => {
-                    reply.status(500).send(err);
-                });
-        }
-    );
-
-    // post a new category
-    fastify.post<{ Body: BlockCategoryType; Reply: BlockCategoryType }>(
-        "/category",
-        {
-            schema: {
-                body: BlockCategory,
-                response: {
-                    200: BlockCategory,
-                },
-            },
-            preHandler: clerkPreHandler,
-        },
-        (request, reply) => {
-            const { name } = request.body;
-
-            prisma.blockCategory
-                .create({
-                    data: {
-                        name,
-                    },
-                })
-                .then((category) => {
-                    reply.status(200).send({
-                        ...category,
-                        id: category.id,
-                    });
-                })
-                .catch((err) => {
-                    reply.status(500).send(err);
-                });
-        }
-    );
-
-    // get all categories with blocks
-    fastify.get<{ Reply: BlockCategoryType[] }>("/category", async (request, reply) => {
-        const categories = await prisma.blockCategory.findMany({
-            include: {
-                blocks: true,
-            },
+      try {
+        const block = await blocksRepo.createBlock(data, userId);
+        // Add a job to the queue
+        screenshotQueue.add({
+          url: (process.env.BLOCK_SCREENSHOT_URL as string) + block.id,
+          id: block.id,
+          selector: "#preview-canvas"
         });
-        reply.status(200).send(categories);
-    });
 
-
-    // get block by id
-    fastify.get<{ Params: { id: string }; Reply: BlockType | null }>("/:id", async (request, reply) => {
-        const block = await prisma.block.findUnique({
-            where: {
-                id: request.params.id,
-            },
-        });
         reply.status(200).send(block);
-    });
+      } catch (err: any) {
+        console.error(err);
+        reply.status(500).send(err.message);
+      }
+    }
+  );
+
+  // post a new category
+  fastify.post<{ Body: BlockCategoryType; Reply: BlockCategoryType }>(
+    "/category",
+    {
+      schema: {
+        body: BlockCategory,
+        response: {
+          200: BlockCategory,
+        },
+      },
+      preHandler: clerkPreHandler,
+    },
+    (request, reply) => {
+      const { name } = request.body;
+
+      prisma.blockCategory
+        .create({
+          data: {
+            name,
+          },
+        })
+        .then((category) => {
+          reply.status(200).send({
+            ...category,
+            id: category.id,
+          });
+        })
+        .catch((err) => {
+          reply.status(500).send(err);
+        });
+    }
+  );
+
+  // get all categories with blocks
+  fastify.get<{ Reply: BlockCategoryType[] }>(
+    "/category",
+    async (request, reply) => {
+      const categories = await blocksRepo.getAllCategories();
+      reply.status(200).send(categories);
+    }
+  );
+
+  // get block by id
+  fastify.get<{ Params: { id: string }; Reply: BlockType | null }>(
+    "/:id",
+    async (request, reply) => {
+      const block = await blocksRepo.getBlockById(request.params.id);
+      reply.status(200).send(block);
+    }
+  );
 }

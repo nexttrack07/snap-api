@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import * as path from "path";
-import { Stream } from "stream";
+import { Readable, Stream } from "stream";
 import { UploadApiResponse, UploadStream } from 'cloudinary';
 
 export function getContentType(filePath: string): string {
@@ -63,3 +63,12 @@ export function streamUpload(
       });
     });
   }
+
+export function streamToBuffer(stream: Readable): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const chunks: Uint8Array[] = [];
+        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('end', () => resolve(Buffer.concat(chunks)));
+        stream.on('error', reject);
+    });
+}

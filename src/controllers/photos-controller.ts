@@ -3,12 +3,10 @@ import { getAuth } from "@clerk/fastify";
 import path from 'path';
 import { removeBackgroundFromImageUrl } from 'remove.bg';
 import { clerkPreHandler } from "../auth";
-import stream from 'stream';
-import util from 'util'; 
 import { sixId, streamUpload } from "../lib/utils";
+import photoService from "../services/photos"
 import { prisma } from "../db-connect";
 
-const pipeline = util.promisify(stream.pipeline);
 
 export default async function photosController(fastify: FastifyInstance) {
   fastify.post("/upload", { preHandler: clerkPreHandler }, async (request: any, reply) => {
@@ -20,7 +18,8 @@ export default async function photosController(fastify: FastifyInstance) {
 
     const public_id = `prodsnap-uploads/${userId}/${id}-${fileNameWithoutExt}`;
 
-    const { url } = await streamUpload(fastify, data.file, public_id);
+    // const { url } = await streamUpload(fastify, data.file, public_id);
+    const { url } = await photoService.uploadPhotoFromStream(data.file, public_id);
 
     await prisma.upload.create({
         data: {
@@ -64,7 +63,7 @@ export default async function photosController(fastify: FastifyInstance) {
 
         const public_id = `prodsnap-uploads/${userId}/` + filename;
 
-        const { url } = await fastify.cloudinary.uploader.upload(photo, { public_id  });
+        const { url } = await photoService.uploadPhotoFromUrl(photo, public_id);
 
         await prisma.upload.create({
             data: {

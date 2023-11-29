@@ -1,4 +1,4 @@
-import Fastify  from "fastify";
+import Fastify   from "fastify";
 import * as dotenv from "dotenv";
 import fastifyCors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
@@ -12,7 +12,29 @@ console.log("CLERK_SECRET_KEY", process.env.CLERK_SECRET_KEY);
 console.log("CLERK_PUBLISHABLE_KEY", process.env.CLERK_PUBLISHABLE_KEY);
 
 const PORT = Number(process.env.PORT) || 5000;
-const server = Fastify({ logger: !!(process.env.NODE_ENV !== "development") });
+type LoggerConfig = {
+    development: any
+    production: any
+    test: any
+  };
+
+  const envToLogger: LoggerConfig = {
+    development: {
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname',
+        },
+      },
+    },
+    production: true,
+    test: false,
+  };
+  
+const server = Fastify({ 
+logger: envToLogger[process.env.NODE_ENV as keyof LoggerConfig] || true
+});
 
 server.register(fastifyCors, {
     origin: "*",

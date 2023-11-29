@@ -37,7 +37,22 @@ dotenv.config();
 console.log("CLERK_SECRET_KEY", process.env.CLERK_SECRET_KEY);
 console.log("CLERK_PUBLISHABLE_KEY", process.env.CLERK_PUBLISHABLE_KEY);
 const PORT = Number(process.env.PORT) || 5000;
-const server = (0, fastify_1.default)({ logger: !!(process.env.NODE_ENV !== "development") });
+const envToLogger = {
+    development: {
+        transport: {
+            target: 'pino-pretty',
+            options: {
+                translateTime: 'HH:MM:ss Z',
+                ignore: 'pid,hostname',
+            },
+        },
+    },
+    production: true,
+    test: false,
+};
+const server = (0, fastify_1.default)({
+    logger: envToLogger[process.env.NODE_ENV] || true
+});
 server.register(cors_1.default, {
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
