@@ -8,7 +8,7 @@ import blocksRepo, {
   BlockCategory,
   BlockCategoryType,
 } from "../repositories/blocks-repo";
-import { screenshotQueue } from "../lib/queue";
+import { screenshotQueue } from "../workers/screenshot";
 
 export default async function blocksController(fastify: FastifyInstance) {
   // post a new block
